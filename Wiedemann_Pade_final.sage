@@ -104,8 +104,8 @@ def Wiedemann(A, b):
         h = -(m - m(0)) / (m(0)*x)
         y = h(A) * b
         
-        if(m(A)*b != vector(F, [0]*n)):
-            continue
+        #if(m(A)*b != vector(F, [0]*n)):
+            #continue
         
         if A*y==b:
             return y
