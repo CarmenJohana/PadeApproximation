@@ -5,11 +5,12 @@ def rev_d(poly, d):
     """Reverso de grado d de un polinomio."""
     R = poly.parent()
     x = R.gen()
-    coeffs = [poly.coefficient(i) for i in range(d+1)]
+    coeffs = [poly[i] for i in range(d+1)]  # <- aquí
     res = R.zero()
     for i, a in enumerate(coeffs):
         res += a * x**(d - i)
     return res
+
 
 
 def egcd_pade_canonico(R, pol1, pol2, k):
@@ -31,7 +32,7 @@ def egcd_pade_canonico(R, pol1, pol2, k):
         
         qi, ri1 = r[i-1].quo_rem(r[i]) # q[i] = r[i-1] quo r[i], ri1 = r[i-1] - q[i]*r[i]
         q.append(qi) # q_i
-
+        lc = 1
         
         if ri1!=0:
             lc = ri1.leading_coefficient()
@@ -79,24 +80,27 @@ def Pade_approximation_from_sequence(seq, n, F):
     return ("ok", m)
 
 
-N = list(range(3,5))
+from sage.all import *
+import csv
+
+N = list(range(3,5))  # dimensiones
+num_trials = 50       # repeticiones por combinación q,n
+Q_vals = list(primes(5, 50))  # más primos
 
 for n in N:
     probs = []
-    Q_vals = list(primes(5, 20))
 
     for q in Q_vals:
         res = []
-        #x = polygen(F)
         F = Zmod(q)
         U = VectorSpace(F, n)
-        for i in range(20):
-
+        
+        for _ in range(num_trials):
             while True:
                 A = random_matrix(F, n, n)
-                b = random_vector(F,n)
+                b = random_vector(F, n)
                 f,_ = A.cyclic_subspace(b, var="x", basis="iterates")
-                if f.degree()==n:
+                if f.degree() == n:
                     break
 
             u = U.random_element()
@@ -106,11 +110,11 @@ for n in N:
             else:
                 res.append(0)
 
-
         probs.append(mean(res))
 
     with open(f"datos/datos_prob{n}.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["q", "prob"])
-        for a,b in zip(Q_vals, probs):
-            writer.writerow([a,b])
+        for a, b in zip(Q_vals, probs):
+            writer.writerow([a, b])
+
